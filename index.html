@@ -1,0 +1,2608 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KASUMIGASEKI CAPITAL</title>
+  <style>
+/* =====================
+   PASSWORD GATE
+   ===================== */
+#pw-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+  background: #000;
+}
+
+#pw-gate .pw-logo {
+  width: 36px;
+  height: 44px;
+  display: block;
+  background:
+    linear-gradient(150deg, #ff4b4b 0 49%, transparent 50%) 0 0 / 50% 50%,
+    linear-gradient(30deg, #c40013 0 49%, transparent 50%) 100% 0 / 50% 50%,
+    linear-gradient(30deg, #e60213 0 49%, transparent 50%) 0 100% / 50% 50%,
+    linear-gradient(150deg, #ff6b6b 0 49%, transparent 50%) 100% 100% / 50% 50%;
+  background-repeat: no-repeat;
+}
+
+#pw-gate form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: min(320px, calc(100vw - 48px));
+}
+
+#pw-gate label {
+  color: rgba(255,255,255,.48);
+  font-family: "Noto Sans JP", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+#pw-gate input[type="password"] {
+  width: 100%;
+  height: 52px;
+  padding: 0 18px;
+  background: #181818;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 0;
+  color: #fff;
+  font-family: "Noto Sans JP", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-align: center;
+  outline: none;
+  transition: border-color .2s;
+}
+
+#pw-gate input[type="password"]:focus {
+  border-color: #e60213;
+}
+
+#pw-gate input[type="password"].is-error {
+  border-color: #e60213;
+  animation: pw-shake .4s ease;
+}
+
+#pw-gate button {
+  width: 100%;
+  height: 52px;
+  border: 0;
+  background: #e60213;
+  color: #fff;
+  font-family: "Noto Sans JP", sans-serif;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  cursor: pointer;
+  transition: background .2s, transform .2s;
+}
+
+#pw-gate button:hover {
+  background: #ff1024;
+  transform: translateY(-1px);
+}
+
+#pw-gate .pw-error {
+  height: 20px;
+  color: #e60213;
+  font-family: "Noto Sans JP", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity .2s;
+}
+
+#pw-gate .pw-error.is-visible {
+  opacity: 1;
+}
+
+@keyframes pw-shake {
+  0%,100% { transform: translateX(0); }
+  20%      { transform: translateX(-8px); }
+  40%      { transform: translateX(8px); }
+  60%      { transform: translateX(-5px); }
+  80%      { transform: translateX(5px); }
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700;800;900&display=swap");
+
+:root {
+  --red: #e60213;
+  --red-bright: #ff1024;
+  --black: #050505;
+  --card: #252525;
+  --card-hover: #303030;
+  --text: rgba(255,255,255,.84);
+  --muted: rgba(255,255,255,.58);
+  --line: rgba(255,255,255,.16);
+  --ease: ease-out;
+  --slide-ease: cubic-bezier(.2,.8,.2,1);
+  --hover-duration: .3s;
+  --nav-duration: .42s;
+  --mobile-menu-duration: .48s;
+  --mobile-panel-duration: .42s;
+
+  --design-w: 1440;
+  --content-max: 1200px;
+  --gutter: clamp(24px, 5.55vw, 120px);
+  --inner: min(var(--content-max), calc(100vw - var(--gutter) * 2));
+  --header-x: clamp(24px, 3.05vw, 44px);
+  --section-y: clamp(72px, 6.25vw, 90px);
+
+  --section-title-size: clamp(56px, calc(112 / var(--design-w) * 100vw), 128px);
+  --section-title-stroke: clamp(2px, calc(3 / var(--design-w) * 100vw), 4px);
+  --section-title-sub-size: clamp(15px, calc(18 / var(--design-w) * 100vw), 22px);
+  --section-title-offset-x: calc(-34 / var(--design-w) * 100vw);
+  --section-title-gap: clamp(10px, calc(14 / var(--design-w) * 100vw), 18px);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: #000;
+  color: var(--text);
+  font-family: "Noto Sans JP", sans-serif;
+  font-weight: 700;
+}
+
+body.is-mobile-nav-open {
+  overflow: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+}
+
+button {
+  font: inherit;
+}
+
+.site-header {
+  position: fixed;
+  z-index: 200;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: clamp(64px, 5.27vw, 76px);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--header-x);
+  background: linear-gradient(to bottom, rgba(0,0,0,.62), rgba(0,0,0,0));
+  transition: transform .36s cubic-bezier(.2,.8,.2,1);
+}
+
+.site-header.is-hidden {
+  transform: translateY(-100%);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  margin-right: clamp(32px, 3.75vw, 54px);
+}
+
+.logo-mark {
+  width: 30px;
+  height: 36px;
+  display: block;
+  background:
+    linear-gradient(150deg, #ff4b4b 0 49%, transparent 50%) 0 0 / 50% 50%,
+    linear-gradient(30deg, #c40013 0 49%, transparent 50%) 100% 0 / 50% 50%,
+    linear-gradient(30deg, #e60213 0 49%, transparent 50%) 0 100% / 50% 50%,
+    linear-gradient(150deg, #ff6b6b 0 49%, transparent 50%) 100% 100% / 50% 50%;
+  background-repeat: no-repeat;
+}
+
+.global-nav,
+.utility-nav {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+}
+
+.utility-nav {
+  margin-left: auto;
+  gap: 28px;
+}
+
+.nav-item {
+  position: relative;
+  display: flex;
+  align-self: stretch;
+  align-items: center;
+}
+
+.nav-link,
+.utility-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: rgba(255,255,255,.78);
+  font-size: 17px;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+  transition: color var(--hover-duration) var(--ease);
+}
+
+.nav-trigger {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.nav-link::after,
+.utility-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -9px;
+  width: 100%;
+  height: 1px;
+  background: var(--red);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--hover-duration) var(--ease);
+}
+
+.nav-link:hover,
+.utility-link:hover,
+.nav-item:hover > .nav-trigger,
+.nav-item:focus-within > .nav-trigger {
+  color: #fff;
+}
+
+.nav-link:hover::after,
+.utility-link:hover::after,
+.nav-item:hover > .nav-trigger::after,
+.nav-item:focus-within > .nav-trigger::after,
+.nav-item.is-open > .nav-trigger::after {
+  transform: scaleX(1);
+}
+
+
+.nav-arrow {
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform var(--hover-duration) var(--ease), color var(--hover-duration) var(--ease);
+}
+
+.nav-item:hover .nav-arrow,
+.nav-item:focus-within .nav-arrow,
+.nav-item.is-open .nav-arrow {
+  color: var(--red);
+  transform: translateY(2px) rotate(225deg);
+}
+
+.bell {
+  position: relative;
+  width: 26px;
+  height: 30px;
+  border: 3px solid rgba(255,255,255,.78);
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
+  border-bottom: 0;
+  transition: none;
+}
+
+.bell::before {
+  content: "";
+  position: absolute;
+  right: -7px;
+  top: -6px;
+  width: 8px;
+  height: 8px;
+  background: var(--red);
+  border-radius: 50%;
+}
+
+.bell::after {
+  content: "";
+  position: absolute;
+  left: 7px;
+  bottom: -8px;
+  width: 8px;
+  height: 3px;
+  background: rgba(255,255,255,.78);
+  border-radius: 2px;
+}
+
+.bell:hover {
+  border-color: var(--red);
+}
+
+.bell:hover::after {
+  background: var(--red);
+}
+
+.mega-menu {
+  position: fixed;
+  z-index: 180;
+  top: calc(clamp(64px, 5.27vw, 76px) - 1px);
+  left: 0;
+  right: 0;
+  min-height: 205px;
+  padding: 44px 0 46px;
+  background: #262626;
+  border-bottom: 1px solid rgba(255,255,255,.16);
+  color: rgba(255,255,255,.82);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-32px);
+  transition:
+    opacity var(--nav-duration) var(--slide-ease),
+    transform var(--nav-duration) var(--slide-ease),
+    visibility 0s linear var(--nav-duration);
+}
+
+/* mega menu visibility is controlled entirely by JS .is-open — no CSS :hover transition */
+.nav-item.is-open .mega-menu {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+  transition:
+    opacity var(--nav-duration) var(--slide-ease),
+    transform var(--nav-duration) var(--slide-ease),
+    visibility 0s;
+}
+
+/* instant swap when moving between nav items */
+.global-nav.is-switching .mega-menu {
+  transition: none !important;
+}
+
+.mega-inner {
+  width: var(--inner);
+  margin: 0 auto;
+}
+
+.mega-title {
+  margin: 0 0 34px;
+  color: rgba(255,255,255,.45);
+  font-size: 34px;
+  line-height: 1.1;
+  font-weight: 900;
+}
+
+.mega-grid {
+  display: grid;
+  gap: 34px 72px;
+}
+
+.mega-grid-4 {
+  grid-template-columns: repeat(4, minmax(160px, 1fr));
+}
+
+.mega-grid-team {
+  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  gap: 42px 72px;
+}
+
+.mega-link-group {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+}
+
+.mega-group-title {
+  margin: 0 0 3px;
+  color: rgba(255,255,255,.42);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.mega-menu a {
+  display: block;
+  color: rgba(255,255,255,.82);
+  font-size: 17px;
+  font-weight: 900;
+  line-height: 1.45;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(255,255,255,.6);
+  transition: color var(--hover-duration) var(--ease), text-decoration-color var(--hover-duration) var(--ease);
+}
+
+.mega-menu a:hover {
+  color: #fff;
+  text-decoration-color: var(--red);
+}
+
+.mobile-header-actions,
+.mobile-nav {
+  display: none;
+}
+
+.mobile-bell {
+  position: relative;
+  width: 18px;
+  height: 21px;
+  border: 2px solid rgba(255,255,255,.78);
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border-bottom: 0;
+}
+
+.mobile-bell::before {
+  content: "";
+  position: absolute;
+  right: -5px;
+  top: -5px;
+  width: 6px;
+  height: 6px;
+  background: var(--red);
+  border-radius: 50%;
+}
+
+.mobile-bell::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  bottom: -6px;
+  width: 6px;
+  height: 2px;
+  background: rgba(255,255,255,.78);
+  border-radius: 2px;
+}
+
+.mobile-menu-button {
+  width: 22px;
+  height: 18px;
+  display: grid;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.mobile-menu-button span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: rgba(255,255,255,.78);
+}
+
+.hero {
+  position: relative;
+  height: clamp(680px, 56.25vw, 810px);
+  min-height: 100svh;
+  overflow: hidden;
+  background:
+    linear-gradient(to bottom, rgba(0,0,0,.25), rgba(0,0,0,.42) 40%, rgba(0,0,0,.74)),
+    url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=2200&auto=format&fit=crop") center / cover;
+}
+
+.hero-copy {
+  position: absolute;
+  top: 37.5%;
+  left: 50%;
+  width: min(100%, 1320px);
+  padding-inline: var(--gutter);
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.hero h1 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(50px, 5.41vw, 78px);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: .06em;
+  text-shadow: 0 12px 32px rgba(0,0,0,.42);
+}
+
+.stock-area {
+  position: absolute;
+  left: clamp(28px, 3.33vw, 48px);
+  bottom: clamp(32px, 3.33vw, 48px);
+  display: flex;
+  gap: clamp(36px, 4.86vw, 70px);
+}
+
+.stock-item {
+  display: grid;
+  gap: 6px;
+  color: #fff;
+  cursor: default;
+}
+
+.stock-item span {
+  font-size: 16px;
+  font-weight: 900;
+  opacity: .9;
+}
+
+.stock-item strong {
+  color: var(--red);
+  font-size: clamp(40px, 3.61vw, 52px);
+  line-height: .85;
+  font-weight: 900;
+}
+
+.stock-item em {
+  margin-left: 5px;
+  color: var(--red);
+  font-size: 16px;
+  font-style: normal;
+}
+
+.app-icons {
+  position: absolute;
+  right: clamp(28px, 2.91vw, 42px);
+  bottom: clamp(32px, 3.33vw, 48px);
+  display: flex;
+  gap: 10px;
+}
+
+.app-icons a {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: #1473d2;
+  font-size: 13px;
+  font-weight: 900;
+  transition: transform var(--hover-duration) var(--ease), filter var(--hover-duration) var(--ease);
+}
+
+.app-icons a:hover {
+  transform: translateY(-3px);
+  filter: brightness(1.2);
+}
+
+.section-inner,
+.team-inner {
+  width: var(--inner);
+  margin: 0 auto;
+}
+
+.section-heading {
+  position: relative;
+  transform: translateX(var(--section-title-offset-x));
+}
+
+.section-heading h2,
+.document-title h2 {
+  margin: 0;
+  color: transparent;
+  font-size: var(--section-title-size);
+  font-weight: 900;
+  line-height: .86;
+  letter-spacing: -.045em;
+  -webkit-text-stroke: var(--section-title-stroke) var(--red);
+  text-shadow: 0 0 18px rgba(230,0,18,.18);
+}
+
+.section-heading p,
+.document-title p {
+  margin: var(--section-title-gap) 0 0;
+  color: var(--red);
+  font-size: var(--section-title-sub-size);
+  font-weight: 900;
+}
+
+.section-heading-news {
+  margin-bottom: clamp(42px, calc(66 / var(--design-w) * 100vw), 76px);
+}
+
+.team-heading {
+  text-align: right;
+  transform: translateX(calc(34 / var(--design-w) * 100vw));
+  margin-bottom: clamp(42px, calc(60 / var(--design-w) * 100vw), 72px);
+}
+
+.red-arrow {
+  position: relative;
+  display: inline-block;
+  width: 64px;
+  height: 2px;
+  background: var(--red);
+  transition: width var(--hover-duration) var(--ease);
+}
+
+.red-arrow::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: -4px;
+  width: 12px;
+  height: 10px;
+  background: var(--red);
+  clip-path: polygon(0 30%, 100% 50%, 0 70%);
+}
+
+.dot {
+  width: 5px;
+  height: 5px;
+  display: inline-block;
+  margin-right: 8px;
+  background: var(--red);
+  border-radius: 50%;
+}
+
+.tag,
+.label {
+  padding: 2px 8px;
+  color: #000;
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.tag {
+  background: var(--red);
+}
+
+.label {
+  background: #d7d7d7;
+}
+
+.news-section {
+  padding: var(--section-y) 0 clamp(84px, 7.63vw, 110px);
+  background:
+    linear-gradient(to bottom, rgba(80,0,8,.94), rgba(45,0,5,.98)),
+    url("https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg") center 40px / min(1400px, 120vw) auto repeat-y;
+}
+
+.pickup-news {
+  margin-top: 0;
+}
+
+.news-main-card {
+  width: 100%;
+  min-height: 400px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--card);
+  overflow: hidden;
+  transition: transform var(--hover-duration) var(--ease);
+}
+
+.news-image {
+  position: relative;
+  overflow: hidden;
+  background: #666;
+}
+
+.news-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--hover-duration) var(--ease), filter var(--hover-duration) var(--ease);
+}
+
+.news-image.is-placeholder {
+  background: #626262;
+}
+
+.news-text {
+  position: relative;
+  background: var(--card);
+  transition: background-color var(--hover-duration) var(--ease);
+}
+
+.news-main-card .news-text {
+  padding: 58px 58px 46px;
+}
+
+.news-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  color: rgba(255,255,255,.58);
+  font-size: 12px;
+}
+
+.news-main-card h3 {
+  margin: 24px 0 18px;
+  color: rgba(255,255,255,.86);
+  font-size: 38px;
+  line-height: 1.35;
+  font-weight: 900;
+  transition: color var(--hover-duration) var(--ease);
+}
+
+.news-main-card p {
+  margin: 0;
+  color: rgba(255,255,255,.55);
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.news-main-card .red-arrow {
+  position: absolute;
+  right: 58px;
+  bottom: 52px;
+}
+
+.sub-news-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(28px, 2.63vw, 38px);
+  margin-top: 40px;
+}
+
+.news-sub-card {
+  min-height: 196px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--card);
+  overflow: hidden;
+  transition: transform var(--hover-duration) var(--ease);
+}
+
+.news-sub-card .news-text {
+  padding: 38px 32px 28px;
+}
+
+.news-sub-card h3 {
+  margin: 16px 0 0;
+  color: rgba(255,255,255,.88);
+  font-size: 19px;
+  line-height: 1.45;
+  font-weight: 900;
+  transition: color var(--hover-duration) var(--ease);
+}
+
+.news-sub-card .red-arrow {
+  position: absolute;
+  right: 32px;
+  bottom: 28px;
+}
+
+.news-main-card:hover,
+.news-sub-card:hover {
+  transform: translateY(-4px);
+}
+
+.news-main-card:hover .news-image img,
+.news-sub-card:hover .news-image img {
+  transform: scale(1.05);
+  filter: brightness(1.08);
+}
+
+.news-main-card:hover .news-text,
+.news-sub-card:hover .news-text {
+  background: var(--card-hover);
+}
+
+.news-main-card:hover h3,
+.news-sub-card:hover h3 {
+  color: #fff;
+}
+
+.news-main-card:hover .red-arrow,
+.news-sub-card:hover .red-arrow,
+.view-all:hover .red-arrow,
+.document-card:hover .red-arrow,
+.team-card:hover .red-arrow {
+  width: 104px;
+}
+
+.more-link-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 42px 0 78px;
+}
+
+.more-link {
+  color: #fff;
+  font-size: 15px;
+  font-weight: 900;
+  transition: color var(--hover-duration) var(--ease), transform var(--hover-duration) var(--ease);
+}
+
+.more-link span {
+  color: var(--red);
+  margin-left: 4px;
+}
+
+.more-link:hover {
+  color: var(--red-bright);
+  transform: translateY(-2px);
+}
+
+.news-panel {
+  background: var(--card);
+}
+
+.tabs {
+  height: 82px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: #000;
+}
+
+.tab {
+  position: relative;
+  border: 0;
+  border-bottom: 2px solid rgba(255,255,255,.55);
+  background: transparent;
+  color: rgba(255,255,255,.55);
+  font-size: 18px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: color var(--hover-duration) var(--ease), background-color var(--hover-duration) var(--ease);
+}
+
+.tab::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  height: 3px;
+  width: 100%;
+  background: var(--red);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--hover-duration) var(--ease);
+}
+
+.tab:hover {
+  color: #fff;
+  background: rgba(255,255,255,.04);
+}
+
+.tab.is-active {
+  color: var(--red);
+}
+
+.tab.is-active::after {
+  transform: scaleX(1);
+}
+
+.news-list {
+  padding: 34px 34px 22px;
+}
+
+.news-list-item {
+  display: block;
+  padding: 20px 0 26px;
+  border-bottom: 1px solid rgba(255,255,255,.14);
+  transition: background-color var(--hover-duration) var(--ease);
+}
+
+.news-list-item:hover {
+  background: rgba(255,255,255,.035);
+}
+
+.news-list-item p {
+  margin: 12px 0 0;
+  color: rgba(255,255,255,.74);
+  font-size: 16px;
+  line-height: 1.7;
+  transition: color var(--hover-duration) var(--ease);
+}
+
+.news-list-item:hover p {
+  color: rgba(255,255,255,.94);
+}
+
+
+.news-list-item strong {
+  color: var(--red);
+  margin: 0 6px;
+}
+
+.view-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin: 8px 0 38px 34px;
+  color: #d9d9d9;
+  font-size: 16px;
+  font-weight: 900;
+  transition: color var(--hover-duration) var(--ease);
+}
+
+.view-all:hover {
+  color: #fff;
+}
+
+.document-section {
+  height: clamp(620px, 52.77vw, 760px);
+  overflow: hidden;
+  background:
+    linear-gradient(to bottom, rgba(0,0,0,.6), rgba(0,0,0,.74)),
+    url("https://images.unsplash.com/photo-1497366754035-f200968a6e72?q=80&w=2200&auto=format&fit=crop") center / cover;
+}
+
+.document-stage {
+  position: relative;
+  height: 100%;
+  display: flex;
+  gap: clamp(24px, 2.36vw, 34px);
+  align-items: flex-start;
+  padding-top: clamp(128px, 11.38vw, 164px);
+}
+
+.document-card {
+  flex: 0 0 clamp(230px, 19.16vw, 276px);
+  height: clamp(330px, 26.52vw, 382px);
+  padding: clamp(36px, 3.33vw, 48px) clamp(30px, 2.91vw, 42px) clamp(28px, 2.36vw, 34px);
+  background: var(--card);
+  box-shadow: 0 18px 44px rgba(0,0,0,.18);
+  position: relative;
+  transition: transform var(--hover-duration) var(--ease), background-color var(--hover-duration) var(--ease);
+}
+
+.document-card:nth-child(even) {
+  margin-top: clamp(48px, 4.44vw, 64px);
+}
+
+.doc-icon {
+  width: 76px;
+  height: 76px;
+  display: block;
+  margin-bottom: 44px;
+  position: relative;
+}
+
+.doc-icon::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 68%;
+  height: 82%;
+  border: 4px solid rgba(255,255,255,.45);
+}
+
+.doc-icon::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 55%;
+  height: 63%;
+  border: 4px solid var(--red);
+  background:
+    linear-gradient(var(--red), var(--red)) 25% 24% / 16% 14%,
+    linear-gradient(var(--red), var(--red)) 62% 24% / 16% 14%,
+    linear-gradient(var(--red), var(--red)) 25% 50% / 16% 14%,
+    linear-gradient(var(--red), var(--red)) 62% 50% / 16% 14%,
+    linear-gradient(var(--red), var(--red)) 25% 76% / 16% 14%,
+    linear-gradient(var(--red), var(--red)) 62% 76% / 16% 14%;
+  background-repeat: no-repeat;
+}
+
+.document-card h3 {
+  margin: 0 0 22px;
+  color: #fff;
+  font-size: 28px;
+  line-height: 1.25;
+  font-weight: 900;
+}
+
+.document-card p {
+  margin: 0;
+  color: rgba(255,255,255,.6);
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.document-card .red-arrow {
+  position: absolute;
+  right: 38px;
+  bottom: 36px;
+}
+
+.document-card:hover {
+  transform: translateY(-4px);
+  background: var(--card-hover);
+}
+
+.document-title {
+  position: absolute;
+  left: calc(-30 / var(--design-w) * 100vw);
+  bottom: calc(42 / var(--design-w) * 100vw);
+}
+
+.team-section {
+  padding: clamp(72px, 5.55vw, 80px) 0 clamp(96px, 8.33vw, 120px);
+  background:
+    linear-gradient(to bottom, rgba(0,0,0,.72), rgba(0,0,0,.82)),
+    url("https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1800&auto=format&fit=crop") center top / cover repeat-y;
+}
+
+.team-category {
+  margin-bottom: 56px;
+}
+
+.team-category h3 {
+  height: 28px;
+  display: flex;
+  align-items: center;
+  margin: 0 0 24px;
+  padding-left: 14px;
+  color: #000;
+  font-size: 15px;
+  font-weight: 900;
+  background: linear-gradient(to right, var(--red) 0%, rgba(230,0,18,.86) 60%, rgba(230,0,18,0) 100%);
+}
+
+.team-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(22px, 1.94vw, 28px);
+}
+
+.team-card {
+  flex: 0 1 clamp(292px, 23.19vw, 334px);
+  height: 120px;
+  display: grid;
+  grid-template-columns: 45% 1fr;
+  background: var(--card);
+  overflow: hidden;
+  position: relative;
+  transition: transform var(--hover-duration) var(--ease), background-color var(--hover-duration) var(--ease);
+}
+
+.team-img {
+  overflow: hidden;
+}
+
+.team-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--hover-duration) var(--ease), filter var(--hover-duration) var(--ease);
+}
+
+.team-card span {
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  color: #fff;
+  font-size: 15px;
+  line-height: 1.45;
+  font-weight: 900;
+}
+
+.team-card .red-arrow {
+  position: absolute;
+  right: 24px;
+  bottom: 22px;
+}
+
+.team-card:hover {
+  transform: translateY(-4px);
+  background: var(--card-hover);
+}
+
+.team-card:hover .team-img img {
+  transform: scale(1.05);
+  filter: brightness(1.08);
+}
+
+.team-row-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(260px, 1fr));
+  gap: clamp(22px, 1.94vw, 28px);
+}
+
+.team-row-grid .team-card {
+  width: auto;
+  flex: initial;
+}
+
+.team-card.is-plain {
+  grid-template-columns: 45% 1fr;
+}
+
+.team-card.is-plain::before {
+  content: "";
+  width: 100%;
+  height: 100%;
+  background: #6c6c6c;
+}
+
+.team-card.is-plain span {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.site-footer {
+  background: #000;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.footer-inner {
+  width: 100%;
+  min-height: 96px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  position: relative;
+  color: rgba(255,255,255,.82);
+  font-size: 15px;
+  font-weight: 900;
+  transition: color var(--hover-duration) var(--ease);
+}
+
+.footer-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 100%;
+  height: 1px;
+  background: var(--red);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--hover-duration) var(--ease);
+}
+
+.footer-links a:hover {
+  color: #fff;
+}
+
+.footer-links a:hover::after {
+  transform: scaleX(1);
+}
+
+.footer-right {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  gap: 28px;
+  margin-left: auto;
+}
+
+.footer-copy {
+  margin: 0;
+  color: rgba(255,255,255,.72);
+  font-size: 15px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.footer-pagetop {
+  width: 72px;
+  align-self: stretch;
+  margin-right: -24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: rgba(255,255,255,.72);
+  background: #4d4d4d;
+  transition: color var(--hover-duration) var(--ease), background-color var(--hover-duration) var(--ease);
+}
+
+.footer-pagetop-icon {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  display: block;
+}
+
+.footer-pagetop-icon::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 6px;
+  width: 14px;
+  height: 14px;
+  border-left: 4px solid currentColor;
+  border-top: 4px solid currentColor;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.footer-pagetop-icon::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 2px;
+  width: 22px;
+  height: 4px;
+  background: currentColor;
+  transform: translateX(-50%);
+}
+
+.footer-pagetop-label {
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: .02em;
+}
+
+.footer-pagetop:hover {
+  color: #fff;
+  background: #595959;
+}
+
+.footer-pagetop:hover .footer-pagetop-icon {
+  color: var(--red);
+}
+
+@media (max-width: 1280px) {
+  .mega-grid-team {
+    grid-template-columns: repeat(3, minmax(180px, 1fr));
+  }
+
+  .mega-grid {
+    gap-inline: 46px;
+  }
+}
+
+@media (max-width: 980px) {
+  .hero {
+    min-height: 640px;
+  }
+
+  .hero h1 {
+    line-height: 1.15;
+  }
+
+  .stock-area {
+    flex-wrap: wrap;
+  }
+
+  .app-icons {
+    display: none;
+  }
+
+  .news-main-card {
+    grid-template-columns: 1fr;
+  }
+
+  .news-main-card .news-text {
+    padding: 40px;
+  }
+
+  .news-image {
+    min-height: 240px;
+  }
+
+  .sub-news-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .news-sub-card {
+    grid-template-columns: 42% 1fr;
+  }
+
+  .tabs {
+    grid-template-columns: repeat(2, 1fr);
+    height: auto;
+  }
+
+  .tab {
+    min-height: 64px;
+  }
+
+  .team-row-grid {
+    grid-template-columns: repeat(2, minmax(240px, 1fr));
+  }
+
+  .footer-inner {
+    align-items: flex-start;
+    padding-block: 22px;
+  }
+}
+
+@media (max-width: 767px) {
+  :root {
+    --gutter: 20px;
+    --section-title-size: 52px;
+    --section-title-offset-x: 0px;
+  }
+
+  .site-header {
+    height: 48px;
+    padding: 0 16px;
+  }
+
+  .logo {
+    margin-right: 0;
+  }
+
+  .logo-mark {
+    width: 18px;
+    height: 22px;
+  }
+
+  .global-nav,
+  .utility-nav {
+    display: none;
+  }
+
+  .mobile-header-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .mobile-nav {
+    position: fixed;
+    z-index: 300;
+    inset: 0;
+    display: block;
+    overflow: hidden;
+    background: #262626;
+    color: rgba(255,255,255,.86);
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateX(100%);
+    transition:
+      transform var(--mobile-menu-duration) var(--slide-ease),
+      visibility 0s linear var(--mobile-menu-duration);
+    will-change: transform;
+  }
+
+  .mobile-nav.is-open {
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(0);
+    transition:
+      transform var(--mobile-menu-duration) var(--slide-ease),
+      visibility 0s;
+  }
+
+  .mobile-panel {
+    position: absolute;
+    inset: 0;
+    display: block;
+    overflow-y: auto;
+    padding: 24px 24px 32px;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateX(100%);
+    transition:
+      transform var(--mobile-panel-duration) var(--slide-ease),
+      visibility 0s linear var(--mobile-panel-duration);
+    will-change: transform;
+  }
+
+  .mobile-panel.is-current {
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(0);
+    transition:
+      transform var(--mobile-panel-duration) var(--slide-ease),
+      visibility 0s;
+  }
+
+  .mobile-panel.is-exit-left {
+    visibility: visible;
+    pointer-events: none;
+    transform: translateX(-100%);
+  }
+
+  .mobile-panel.is-exit-right {
+    visibility: visible;
+    pointer-events: none;
+    transform: translateX(100%);
+  }
+
+  .mobile-panel.is-enter-left {
+    visibility: visible;
+    transform: translateX(-100%);
+  }
+
+  .mobile-panel.is-enter-right {
+    visibility: visible;
+    transform: translateX(100%);
+  }
+
+  .mobile-close,
+  .mobile-back {
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: var(--red);
+    font: inherit;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .mobile-close {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    font-size: 26px;
+    font-weight: 400;
+  }
+
+  .mobile-panel-head {
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 42px;
+  }
+
+  .mobile-panel-head .mobile-close {
+    position: static;
+    margin-left: auto;
+  }
+
+  .mobile-back {
+    font-size: 28px;
+  }
+
+  .mobile-panel-head h2 {
+    margin: 0;
+    color: rgba(255,255,255,.48);
+    font-size: 22px;
+    line-height: 1.1;
+    font-weight: 900;
+  }
+
+  .mobile-root-links {
+    display: grid;
+    gap: 26px;
+    padding-top: 66px;
+  }
+
+  .mobile-root-link {
+    width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: rgba(255,255,255,.86);
+    font: inherit;
+    font-size: 24px;
+    line-height: 1.2;
+    font-weight: 900;
+    cursor: pointer;
+  }
+
+  .mobile-root-link span {
+    color: var(--red);
+    font-size: 24px;
+    font-weight: 500;
+  }
+
+  .mobile-root-anchor {
+    text-decoration: none;
+  }
+
+  .mobile-blog-link {
+    margin-top: 38px;
+  }
+
+  .mobile-app-icons {
+    position: absolute;
+    left: 24px;
+    right: 24px;
+    bottom: 28px;
+    display: flex;
+    gap: 12px;
+  }
+
+  .mobile-app-icons a {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    background: #1473d2;
+    font-size: 13px;
+    font-weight: 900;
+  }
+
+  .mobile-sub-links {
+    display: grid;
+    gap: 32px;
+  }
+
+  .mobile-sub-links a,
+  .mobile-team-links a {
+    width: fit-content;
+    color: rgba(255,255,255,.86);
+    font-size: 18px;
+    line-height: 1.45;
+    font-weight: 900;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .mobile-team-links {
+    display: grid;
+    grid-template-columns: 78px 1fr;
+    column-gap: 18px;
+    row-gap: 24px;
+  }
+
+  .mobile-team-links p {
+    margin: 0;
+    color: rgba(255,255,255,.44);
+    font-size: 13px;
+    line-height: 1.45;
+    font-weight: 900;
+  }
+
+  .mobile-team-links div {
+    display: grid;
+    gap: 14px;
+  }
+
+  .section-heading,
+  .team-heading {
+    transform: none;
+  }
+
+  .hero {
+    min-height: 560px;
+  }
+
+  .hero-copy {
+    top: 34%;
+  }
+
+  .hero h1 {
+    font-size: 42px;
+  }
+
+  .stock-area {
+    left: 20px;
+    right: 20px;
+    bottom: 28px;
+  }
+
+  .stock-item strong {
+    font-size: 34px;
+  }
+
+  .news-main-card,
+  .news-sub-card {
+    grid-template-columns: 1fr;
+  }
+
+  .news-main-card {
+    min-height: auto;
+  }
+
+  .news-main-card h3 {
+    font-size: 26px;
+  }
+
+  .news-sub-card {
+    min-height: auto;
+  }
+
+  .news-sub-card .news-image {
+    min-height: 180px;
+  }
+
+  .news-list {
+    padding-inline: 20px;
+  }
+
+  .news-list-item p {
+    font-size: 14px;
+  }
+
+  .document-section {
+    height: auto;
+    padding: 80px 0 140px;
+  }
+
+  .document-stage {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: auto;
+    gap: 10px;
+    padding-top: 0;
+    overflow: visible;
+  }
+
+  .document-title {
+    position: static;
+    order: -1;
+    grid-column: 1 / -1;
+  }
+
+  .document-card {
+    width: 100%;
+    height: auto;
+    min-height: 155px;
+    margin-top: 0 !important;
+    padding: 24px 18px 22px;
+  }
+
+  .doc-icon {
+    width: 36px;
+    height: 36px;
+    margin-bottom: 18px;
+  }
+
+  .doc-icon::before,
+  .doc-icon::after {
+    border-width: 2px;
+  }
+
+  .document-card h3 {
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+
+  .document-card p {
+    display: none;
+  }
+
+  .document-card .red-arrow {
+    right: 14px;
+    bottom: 14px;
+    width: 30px;
+  }
+
+  .team-row-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .team-card {
+    flex-basis: calc(50% - 5px);
+    height: 112px;
+    grid-template-columns: 1fr;
+  }
+
+  .team-card img,
+  .team-card.is-plain::before {
+    height: 54px;
+  }
+
+  .team-card span {
+    min-height: 58px;
+    align-items: flex-start;
+    padding: 10px 12px;
+    font-size: 11px;
+  }
+
+  .team-card .red-arrow {
+    right: 12px;
+    bottom: 10px;
+    width: 28px;
+  }
+
+  .footer-inner {
+    display: grid;
+    gap: 18px;
+  }
+
+  .footer-links {
+    gap: 18px;
+  }
+
+  .footer-links a,
+  .footer-copy {
+    font-size: 13px;
+  }
+
+  .footer-right {
+    width: 100%;
+    justify-content: space-between;
+    margin-left: 0;
+  }
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--red);
+  outline-offset: 4px;
+}
+
+
+@media (max-width: 767px) {
+  .mobile-nav {
+    display: block;
+    position: fixed;
+    z-index: 300;
+    inset: 0;
+    overflow: hidden;
+    background: #262626;
+    color: rgba(255,255,255,.86);
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateX(100%);
+    transition:
+      transform .52s cubic-bezier(.2,.8,.2,1),
+      visibility 0s linear .52s;
+    will-change: transform;
+  }
+
+  .mobile-nav.is-open {
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(0);
+    transition:
+      transform .52s cubic-bezier(.2,.8,.2,1),
+      visibility 0s;
+  }
+
+  /* hidden base — no transition prevents ghost slide when is-current is removed */
+  .mobile-panel {
+    position: absolute;
+    inset: 0;
+    display: block;
+    overflow-y: auto;
+    padding: 24px 24px 32px;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateX(100%);
+    transition: none;
+    will-change: transform;
+  }
+
+  /* staging: snap to entry position before transition fires */
+  .mobile-panel.is-staging          { visibility: visible; pointer-events: none; transition: none; }
+  .mobile-panel.is-staging.from-right { transform: translateX(100%); }
+  .mobile-panel.is-staging.from-left  { transform: translateX(-100%); }
+
+  /* active — all transitions live here only */
+  .mobile-panel.is-current {
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(0);
+    transition: transform .46s cubic-bezier(.2,.8,.2,1);
+  }
+
+  /* exits: inherit transition from is-current */
+  .mobile-panel.is-current.is-exit-left  { transform: translateX(-100%); pointer-events: none; }
+  .mobile-panel.is-current.is-exit-right { transform: translateX(100%);  pointer-events: none; }
+}
+  </style>
+</head>
+<body>
+
+<header class="site-header" id="top">
+  <a href="#" class="logo" aria-label="Home">
+    <span class="logo-mark"></span>
+  </a>
+
+  <nav class="global-nav" aria-label="グローバルナビゲーション">
+    <div class="nav-item has-dropdown">
+      <button class="nav-link nav-trigger" type="button" aria-expanded="false">
+        NEWS
+        <span class="nav-arrow" aria-hidden="true"></span>
+      </button>
+
+      <div class="mega-menu mega-menu-news">
+        <div class="mega-inner">
+          <h2 class="mega-title">NEWS</h2>
+
+          <div class="mega-grid mega-grid-4">
+            <a href="#">全社お知らせ</a>
+            <a href="#">IR</a>
+            <a href="#">プレスリリース</a>
+            <a href="#">メディア情報</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-item has-dropdown">
+      <button class="nav-link nav-trigger" type="button" aria-expanded="false">
+        文書・手続き紹介
+        <span class="nav-arrow" aria-hidden="true"></span>
+      </button>
+
+      <div class="mega-menu mega-menu-documents">
+        <div class="mega-inner">
+          <h2 class="mega-title">文書・手続き紹介</h2>
+
+          <div class="mega-grid mega-grid-4">
+            <div class="mega-link-group">
+              <a href="#">人事・働き方</a>
+              <a href="#">ツール・システム</a>
+            </div>
+
+            <div class="mega-link-group">
+              <a href="#">申請</a>
+              <a href="#">内部通報・コンプラ</a>
+            </div>
+
+            <div class="mega-link-group">
+              <a href="#">精算</a>
+              <a href="#">社内交流・イベント</a>
+            </div>
+
+            <div class="mega-link-group">
+              <a href="#">オフィス関連</a>
+              <a href="#">社内規定・マニュアル</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-item has-dropdown">
+      <button class="nav-link nav-trigger" type="button" aria-expanded="false">
+        部署紹介
+        <span class="nav-arrow" aria-hidden="true"></span>
+      </button>
+
+      <div class="mega-menu mega-menu-team">
+        <div class="mega-inner">
+          <h2 class="mega-title">部署紹介</h2>
+
+          <div class="mega-grid mega-grid-team">
+            <div class="mega-link-group">
+              <p class="mega-group-title">ホテル事業</p>
+              <a href="#">Hospitality and Culture Division</a>
+              <a href="#">Real Estate and Development Division</a>
+            </div>
+
+            <div class="mega-link-group">
+              <p class="mega-group-title">ホスピス事業</p>
+              <a href="#">ライフスタイルアセット事業本部</a>
+            </div>
+
+            <div class="mega-link-group">
+              <p class="mega-group-title">物流事業</p>
+              <a href="#">インフライベーション事業本部</a>
+              <a href="#">インフライベーション戦略本部</a>
+            </div>
+
+            <div class="mega-link-group">
+              <p class="mega-group-title">海外事業</p>
+              <a href="#">オルタナティブ投資事業本部</a>
+              <a href="#">Global Investment Management</a>
+            </div>
+
+            <div class="mega-link-group">
+              <p class="mega-group-title">コーポレート</p>
+              <a href="#">管理本部</a>
+              <a href="#">財務本部</a>
+              <a href="#">人財戦略本部</a>
+              <a href="#">PR</a>
+              <a href="#">内部監査・コンプラ</a>
+              <a href="#">AI Lab</a>
+            </div>
+
+            <div class="mega-link-group">
+              <p class="mega-group-title">グループ会社</p>
+              <a href="#">霞ヶ関リートアドバイザーズ</a>
+              <a href="#">霞ヶ関アセットマネジメント</a>
+              <a href="#">fav hospitality group</a>
+              <a href="#">パンデオン地所</a>
+              <a href="#">KC-Welfare</a>
+              <a href="#">霞ヶ関ソリューション</a>
+              <a href="#">モビリティ</a>
+              <a href="#">霞ヶ関建設</a>
+            </div>
+
+            <div class="mega-link-group">
+              <p class="mega-group-title">その他</p>
+              <a href="#">社長室</a>
+              <a href="#">会長室</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <a href="#" class="nav-link">業務アプリ一覧</a>
+  </nav>
+
+  <nav class="utility-nav" aria-label="補助ナビゲーション">
+    <a href="#" class="utility-link">社長Blog</a>
+    <a href="#" class="utility-link">役員Blog</a>
+    <a href="#" class="bell" aria-label="通知"></a>
+  </nav>
+
+  <div class="mobile-header-actions">
+    <a href="#" class="mobile-bell" aria-label="通知"></a>
+
+    <button class="mobile-menu-button" type="button" aria-label="メニューを開く" aria-controls="mobileNav" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+</header>
+
+<nav class="mobile-nav" id="mobileNav" aria-hidden="true">
+  <section class="mobile-panel is-current" data-panel="root">
+    <button class="mobile-close" type="button" aria-label="メニューを閉じる">×</button>
+
+    <div class="mobile-root-links">
+      <button class="mobile-root-link" type="button" data-open-panel="news">
+        NEWS <span>＋</span>
+      </button>
+
+      <button class="mobile-root-link" type="button" data-open-panel="documents">
+        文書・手続き紹介 <span>＋</span>
+      </button>
+
+      <button class="mobile-root-link" type="button" data-open-panel="team">
+        部署紹介 <span>＋</span>
+      </button>
+
+      <a href="#" class="mobile-root-link mobile-root-anchor">業務アプリ一覧</a>
+
+      <a href="#" class="mobile-root-link mobile-root-anchor mobile-blog-link">社長Blog</a>
+      <a href="#" class="mobile-root-link mobile-root-anchor">役員Blog</a>
+    </div>
+
+    <div class="mobile-app-icons">
+      <a href="#">box</a>
+      <a href="#">J</a>
+      <a href="#">T</a>
+      <a href="#">box</a>
+      <a href="#">J</a>
+      <a href="#">T</a>
+    </div>
+  </section>
+
+  <section class="mobile-panel" data-panel="news">
+    <div class="mobile-panel-head">
+      <button class="mobile-back" type="button" data-back-panel aria-label="戻る">←</button>
+      <h2>NEWS</h2>
+      <button class="mobile-close" type="button" aria-label="メニューを閉じる">×</button>
+    </div>
+
+    <div class="mobile-sub-links">
+      <a href="#">全社お知らせ</a>
+      <a href="#">IR</a>
+      <a href="#">プレスリリース</a>
+      <a href="#">メディア情報</a>
+    </div>
+  </section>
+
+  <section class="mobile-panel" data-panel="documents">
+    <div class="mobile-panel-head">
+      <button class="mobile-back" type="button" data-back-panel aria-label="戻る">←</button>
+      <h2>文書・手続き紹介</h2>
+      <button class="mobile-close" type="button" aria-label="メニューを閉じる">×</button>
+    </div>
+
+    <div class="mobile-sub-links">
+      <a href="#">人事・働き方</a>
+      <a href="#">申請</a>
+      <a href="#">精算</a>
+      <a href="#">オフィス関連</a>
+      <a href="#">ツール・システム</a>
+      <a href="#">内部通報・コンプラ</a>
+      <a href="#">社内交流・イベント</a>
+      <a href="#">社内規定・マニュアル</a>
+    </div>
+  </section>
+
+  <section class="mobile-panel" data-panel="team">
+    <div class="mobile-panel-head">
+      <button class="mobile-back" type="button" data-back-panel aria-label="戻る">←</button>
+      <h2>部署紹介</h2>
+      <button class="mobile-close" type="button" aria-label="メニューを閉じる">×</button>
+    </div>
+
+    <div class="mobile-team-links">
+      <p>物流事業</p>
+      <div>
+        <a href="#">インフライベーション事業本部</a>
+        <a href="#">インフライベーション戦略本部</a>
+      </div>
+
+      <p>ホテル事業</p>
+      <div>
+        <a href="#">Hospitality and Culture Division</a>
+        <a href="#">Real Estate and Development Division</a>
+      </div>
+
+      <p>ヘルスケア事業</p>
+      <div>
+        <a href="#">ライフスタイルアセット事業本部</a>
+      </div>
+
+      <p>オルタナティブ投資事業</p>
+      <div>
+        <a href="#">オルタナティブ投資事業本部</a>
+      </div>
+
+      <p>管理</p>
+      <div>
+        <a href="#">管理本部</a>
+      </div>
+
+      <p>財務</p>
+      <div>
+        <a href="#">財務本部</a>
+      </div>
+
+      <p>人事</p>
+      <div>
+        <a href="#">人財戦略本部</a>
+      </div>
+
+      <p>本社</p>
+      <div>
+        <a href="#">環境事業推進</a>
+        <a href="#">コンプライアンス統括</a>
+        <a href="#">内部監査</a>
+        <a href="#">社長室</a>
+        <a href="#">AI Lab</a>
+        <a href="#">Global Investment Management</a>
+      </div>
+
+      <p>その他・支社</p>
+      <div>
+        <a href="#">企業名/ロゴ</a>
+        <a href="#">企業名/ロゴ</a>
+        <a href="#">企業名/ロゴ</a>
+      </div>
+    </div>
+  </section>
+</nav>
+
+<main>
+  <section class="hero">
+    <div class="hero-copy">
+      <h1>速く。手堅く。力強く。</h1>
+    </div>
+
+    <div class="stock-area" aria-label="株価情報">
+      <div class="stock-item">
+        <span>TSE:3498</span>
+        <strong>7,470<em>JPY</em></strong>
+      </div>
+
+      <div class="stock-item">
+        <span>TSE:3498</span>
+        <strong>7,470<em>JPY</em></strong>
+      </div>
+    </div>
+
+    <div class="app-icons">
+      <a href="#" aria-label="box">box</a>
+      <a href="#" aria-label="J">J</a>
+      <a href="#" aria-label="T">T</a>
+      <a href="#" aria-label="box">box</a>
+      <a href="#" aria-label="J">J</a>
+      <a href="#" aria-label="T">T</a>
+    </div>
+  </section>
+
+  <section class="news-section section-surface">
+    <div class="section-inner">
+      <div class="section-heading section-heading-news">
+        <h2>NEWS</h2>
+        <p>お知らせ</p>
+      </div>
+
+      <div class="pickup-news">
+        <a href="#" class="news-main-card">
+          <div class="news-image">
+            <img src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?q=80&w=1000&auto=format&fit=crop" alt="">
+          </div>
+
+          <div class="news-text">
+            <div class="news-meta">
+              <span class="dot"></span>
+              <span class="tag">内部監査・コンプラ</span>
+              <span class="label">管理職</span>
+              <span>♥ 46</span>
+            </div>
+
+            <h3>【社内ツール公開のお知らせ】社内問合せ窓口ナビを公開します</h3>
+            <p>情報システム部 DX推進チームよりお知らせです。毎月新入社員を迎える中、どの部署に聞けばよいか分からないとい...</p>
+            <span class="red-arrow"></span>
+          </div>
+        </a>
+
+        <div class="sub-news-grid">
+          <a href="#" class="news-sub-card">
+            <div class="news-image is-placeholder"></div>
+
+            <div class="news-text">
+              <div class="news-meta">
+                <span class="dot"></span>
+                <span class="tag">内部監査・コンプラ</span>
+                <span class="label">管理職</span>
+              </div>
+
+              <h3>タイトルが入ります。タイトルが入ります。</h3>
+              <span class="red-arrow"></span>
+            </div>
+          </a>
+
+          <a href="#" class="news-sub-card">
+            <div class="news-image">
+              <img src="https://images.unsplash.com/photo-1497366811353-6870744d04b2?q=80&w=800&auto=format&fit=crop" alt="">
+            </div>
+
+            <div class="news-text">
+              <div class="news-meta">
+                <span class="dot"></span>
+                <span class="tag">内部監査・コンプラ</span>
+                <span class="label">管理職</span>
+              </div>
+
+              <h3>ハイブリッドワーク時代の「繋がる」オフィス。</h3>
+              <span class="red-arrow"></span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="more-link-wrap">
+        <a href="#" class="more-link">もっと見る <span>＋</span></a>
+      </div>
+
+      <div class="news-panel">
+        <div class="tabs" role="tablist">
+          <button class="tab is-active" type="button">全社お知らせ</button>
+          <button class="tab" type="button">IR</button>
+          <button class="tab" type="button">プレスリリース</button>
+          <button class="tab" type="button">メディア情報</button>
+        </div>
+
+        <div class="news-list">
+          <a href="#" class="news-list-item">
+            <div class="news-meta">
+              <span class="dot"></span>
+              <span class="tag">経理</span>
+              <span class="label">管理職</span>
+              <span>♥ 46</span>
+            </div>
+            <p>YYYY年MM月DD日 <strong>NEW</strong>　物流施設開発用地の取得に関するお知らせ</p>
+          </a>
+
+          <a href="#" class="news-list-item">
+            <div class="news-meta">
+              <span class="dot"></span>
+              <span class="tag">内部監査・コンプラ</span>
+              <span class="label">管理職</span>
+              <span>♥ 46</span>
+            </div>
+            <p>YYYY年MM月DD日 <strong>NEW</strong>　物流施設開発用地の取得に関するお知らせ 物流施設開発用地の取得に関するお知らせ</p>
+          </a>
+
+          <a href="#" class="news-list-item">
+            <div class="news-meta">
+              <span class="tag">経理</span>
+              <span class="label">管理職</span>
+              <span>♥ 46</span>
+            </div>
+            <p>YYYY年MM月DD日　物流施設開発用地の取得に関するお知らせ</p>
+          </a>
+        </div>
+
+        <a href="#" class="view-all">View All <span class="red-arrow"></span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="document-section section-surface">
+    <div class="section-inner document-stage">
+      <a href="#" class="document-card">
+        <span class="doc-icon"></span>
+        <h3>人事・働き方</h3>
+        <p>入社・勤務・制度など、働き方に関する手続きや情報をまとめています。</p>
+        <span class="red-arrow"></span>
+      </a>
+
+      <a href="#" class="document-card">
+        <span class="doc-icon"></span>
+        <h3>申請</h3>
+        <p>稟議など各種申請手続きをまとめています。</p>
+        <span class="red-arrow"></span>
+      </a>
+
+      <a href="#" class="document-card">
+        <span class="doc-icon"></span>
+        <h3>精算</h3>
+        <p>経費精算や請求書処理</p>
+        <span class="red-arrow"></span>
+      </a>
+
+      <a href="#" class="document-card">
+        <span class="doc-icon"></span>
+        <h3>オフィス・設備</h3>
+        <p>会議室予約や備品購入、社内設備の利用に関する手続き。</p>
+        <span class="red-arrow"></span>
+      </a>
+
+      <div class="document-title section-heading">
+        <h2>DOCUMENT</h2>
+        <p>文章・手続き紹介</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="team-section section-surface">
+    <div class="team-inner">
+      <div class="section-heading team-heading">
+        <h2>OUR TEAM</h2>
+        <p>部署紹介</p>
+      </div>
+
+      <div class="team-category">
+        <h3>物流事業</h3>
+        <div class="team-row">
+          <a href="#" class="team-card">
+            <div class="team-img"><img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=700&auto=format&fit=crop" alt=""></div>
+            <span>インフライベーション事業本部</span>
+            <i class="red-arrow"></i>
+          </a>
+
+          <a href="#" class="team-card">
+            <div class="team-img"><img src="https://images.unsplash.com/photo-1497366811353-6870744d04b2?q=80&w=700&auto=format&fit=crop" alt=""></div>
+            <span>インフライベーション戦略本部</span>
+            <i class="red-arrow"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="team-category">
+        <h3>ホテル事業</h3>
+        <div class="team-row">
+          <a href="#" class="team-card">
+            <div class="team-img"><img src="https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=700&auto=format&fit=crop" alt=""></div>
+            <span>Hospitality and Culture Division</span>
+            <i class="red-arrow"></i>
+          </a>
+
+          <a href="#" class="team-card">
+            <div class="team-img"><img src="https://images.unsplash.com/photo-1530549387789-4c1017266635?q=80&w=700&auto=format&fit=crop" alt=""></div>
+            <span>Real Estate and Development Division</span>
+            <i class="red-arrow"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="team-category">
+        <h3>本社</h3>
+        <div class="team-row team-row-grid">
+          <a href="#" class="team-card is-plain"><span>管理本部</span><i class="red-arrow"></i></a>
+          <a href="#" class="team-card is-plain"><span>財務本部</span><i class="red-arrow"></i></a>
+          <a href="#" class="team-card is-plain"><span>人財戦略本部</span><i class="red-arrow"></i></a>
+          <a href="#" class="team-card is-plain"><span>PR</span><i class="red-arrow"></i></a>
+          <a href="#" class="team-card is-plain"><span>内部監査・コンプラ</span><i class="red-arrow"></i></a>
+          <a href="#" class="team-card is-plain"><span>AI Lab</span><i class="red-arrow"></i></a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="#">このイントラについて</a>
+      <a href="#">お問い合わせ（情報システム部）</a>
+    </div>
+
+    <div class="footer-right">
+      <p class="footer-copy">© 2026 KASUMIGASEKI CAPITAL.</p>
+
+      <a href="#top" class="footer-pagetop" aria-label="ページ上部へ戻る">
+        <span class="footer-pagetop-icon" aria-hidden="true"></span>
+        <span class="footer-pagetop-label">PAGE TOP</span>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<div id="pw-gate">
+  <span class="pw-logo"></span>
+  <form id="pw-form">
+    <label for="pw-input">PASSWORD</label>
+    <input type="password" id="pw-input" autocomplete="off" placeholder="••••••••••">
+    <p class="pw-error" id="pw-error">パスワードが違います</p>
+    <button type="submit">入る</button>
+  </form>
+</div>
+
+<script>
+const tabs = document.querySelectorAll(".tab");
+
+tabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    tabs.forEach((item) => item.classList.remove("is-active"));
+    tab.classList.add("is-active");
+  });
+});
+
+/* PC header dropdown */
+const dropdownItems = document.querySelectorAll(".has-dropdown");
+let activeDropdown = null;
+
+const closeDropdown = (item) => {
+  const trigger = item.querySelector(".nav-trigger");
+  item.classList.remove("is-open");
+  trigger?.setAttribute("aria-expanded", "false");
+
+  if (activeDropdown === item) {
+    activeDropdown = null;
+  }
+};
+
+const closeAllDropdowns = (exceptItem = null) => {
+  dropdownItems.forEach((item) => {
+    if (item !== exceptItem) {
+      clearTimeout(item._dropdownCloseTimer);
+      closeDropdown(item);
+    }
+  });
+};
+
+const globalNav = document.querySelector(".global-nav");
+
+const openDropdown = (item) => {
+  const trigger = item.querySelector(".nav-trigger");
+  clearTimeout(item._dropdownCloseTimer);
+
+  if (activeDropdown && activeDropdown !== item) {
+    // switching between items — instant swap, skip re-animation
+    globalNav.classList.add("is-switching");
+    closeAllDropdowns(item);
+    item.classList.add("is-open");
+    trigger?.setAttribute("aria-expanded", "true");
+    activeDropdown = item;
+    // double rAF: ensure one frame is painted with transition:none before re-enabling
+    requestAnimationFrame(() => requestAnimationFrame(() => globalNav.classList.remove("is-switching")));
+    return;
+  }
+
+  closeAllDropdowns(item);
+  item.classList.add("is-open");
+  trigger?.setAttribute("aria-expanded", "true");
+  activeDropdown = item;
+};
+
+const scheduleCloseDropdown = (item) => {
+  clearTimeout(item._dropdownCloseTimer);
+
+  item._dropdownCloseTimer = setTimeout(() => {
+    closeDropdown(item);
+  }, 260);
+};
+
+dropdownItems.forEach((item) => {
+  const trigger = item.querySelector(".nav-trigger");
+  const menu = item.querySelector(".mega-menu");
+
+  item.addEventListener("pointerenter", () => openDropdown(item));
+  item.addEventListener("pointerleave", () => scheduleCloseDropdown(item));
+
+  menu?.addEventListener("pointerenter", () => openDropdown(item));
+  menu?.addEventListener("pointerleave", () => scheduleCloseDropdown(item));
+
+  item.addEventListener("focusin", () => openDropdown(item));
+  item.addEventListener("focusout", () => {
+    setTimeout(() => {
+      if (!item.contains(document.activeElement)) {
+        scheduleCloseDropdown(item);
+      }
+    }, 0);
+  });
+
+  trigger?.addEventListener("click", (event) => {
+    event.preventDefault();
+
+    if (item.classList.contains("is-open")) {
+      closeDropdown(item);
+    } else {
+      openDropdown(item);
+    }
+  });
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    closeAllDropdowns();
+  }
+});
+
+document.addEventListener("pointerdown", (event) => {
+  if (activeDropdown && !activeDropdown.contains(event.target)) {
+    closeAllDropdowns();
+  }
+});
+
+/* SP full screen nav */
+const mobileMenuButton = document.querySelector(".mobile-menu-button");
+const mobileNav = document.querySelector(".mobile-nav");
+const mobileCloseButtons = document.querySelectorAll(".mobile-close");
+const mobileRootButtons = document.querySelectorAll("[data-open-panel]");
+const mobileBackButtons = document.querySelectorAll("[data-back-panel]");
+const mobilePanels = document.querySelectorAll(".mobile-panel");
+
+let currentMobilePanel = "root";
+let isMobilePanelAnimating = false;
+
+const MOBILE_PANEL_DURATION = 460;
+const MOBILE_NAV_DURATION = 520;
+
+const getMobilePanel = (panelName) => {
+  return document.querySelector(`.mobile-panel[data-panel="${panelName}"]`);
+};
+
+const clearPanelMotionClasses = (panel) => {
+  panel.classList.remove(
+    "is-staging", "from-left", "from-right",
+    "is-exit-left", "is-exit-right"
+  );
+};
+
+const resetMobilePanel = () => {
+  mobilePanels.forEach((panel) => {
+    clearPanelMotionClasses(panel);
+    panel.classList.toggle("is-current", panel.dataset.panel === "root");
+  });
+
+  currentMobilePanel = "root";
+  isMobilePanelAnimating = false;
+};
+
+const setMobilePanel = (nextPanelName, direction = "forward") => {
+  if (isMobilePanelAnimating || currentMobilePanel === nextPanelName) return;
+
+  const currentPanel = getMobilePanel(currentMobilePanel);
+  const nextPanel = getMobilePanel(nextPanelName);
+  if (!currentPanel || !nextPanel) return;
+
+  isMobilePanelAnimating = true;
+  mobilePanels.forEach(clearPanelMotionClasses);
+
+  const fromClass = direction === "forward" ? "from-right" : "from-left";
+  const exitClass = direction === "forward" ? "is-exit-left" : "is-exit-right";
+
+  // 1. Stage next panel at entry position — no transition fires yet
+  nextPanel.classList.add("is-staging", fromClass);
+  nextPanel.offsetHeight; // commit staged position to browser
+
+  requestAnimationFrame(() => {
+    // 2. Exit current (transition from is-current fires)
+    currentPanel.classList.add(exitClass);
+
+    // 3. Remove staging → add is-current; transition fires from staged pos → translateX(0)
+    nextPanel.classList.remove("is-staging", fromClass);
+    nextPanel.classList.add("is-current");
+
+    window.setTimeout(() => {
+      currentPanel.classList.remove("is-current", exitClass);
+      mobilePanels.forEach(clearPanelMotionClasses);
+      currentMobilePanel = nextPanelName;
+      isMobilePanelAnimating = false;
+    }, MOBILE_PANEL_DURATION);
+  });
+};
+
+const openMobileNav = () => {
+  resetMobilePanel();
+
+  mobileNav.classList.add("is-open");
+  mobileNav.setAttribute("aria-hidden", "false");
+  mobileMenuButton?.setAttribute("aria-expanded", "true");
+  document.body.classList.add("is-mobile-nav-open");
+};
+
+const closeMobileNav = () => {
+  mobileNav.classList.remove("is-open");
+  mobileNav.setAttribute("aria-hidden", "true");
+  mobileMenuButton?.setAttribute("aria-expanded", "false");
+  document.body.classList.remove("is-mobile-nav-open");
+
+  window.setTimeout(() => {
+    resetMobilePanel();
+  }, MOBILE_NAV_DURATION);
+};
+
+mobileMenuButton?.addEventListener("click", openMobileNav);
+
+mobileCloseButtons.forEach((button) => {
+  button.addEventListener("click", closeMobileNav);
+});
+
+mobileRootButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    setMobilePanel(button.dataset.openPanel, "forward");
+  });
+});
+
+mobileBackButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    setMobilePanel("root", "back");
+  });
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && mobileNav?.classList.contains("is-open")) {
+    closeMobileNav();
+  }
+});
+
+/* scroll-hide header */
+const siteHeader = document.querySelector(".site-header");
+let lastScrollY = window.scrollY;
+
+window.addEventListener("scroll", () => {
+  const currentY = window.scrollY;
+  const scrollingDown = currentY > lastScrollY;
+
+  if (scrollingDown && currentY > siteHeader.offsetHeight) {
+    siteHeader.classList.add("is-hidden");
+    closeAllDropdowns();
+  } else if (!scrollingDown) {
+    siteHeader.classList.remove("is-hidden");
+  }
+
+  lastScrollY = currentY;
+}, { passive: true });
+
+/* =====================
+   PASSWORD GATE
+   ===================== */
+(function () {
+  const PW = 'G4s2izZbCc';
+  const gate = document.getElementById('pw-gate');
+  if (!gate) return;
+  if (sessionStorage.getItem('kc-auth') === PW) { gate.remove(); return; }
+  document.body.style.overflow = 'hidden';
+  document.getElementById('pw-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const input = document.getElementById('pw-input');
+    const error = document.getElementById('pw-error');
+    if (input.value === PW) {
+      sessionStorage.setItem('kc-auth', PW);
+      gate.style.transition = 'opacity .4s';
+      gate.style.opacity = '0';
+      setTimeout(() => { gate.remove(); document.body.style.overflow = ''; }, 400);
+    } else {
+      input.classList.remove('is-error');
+      void input.offsetWidth;
+      input.classList.add('is-error');
+      error.classList.add('is-visible');
+      input.value = '';
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
